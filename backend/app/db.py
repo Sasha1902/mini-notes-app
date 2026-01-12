@@ -4,11 +4,12 @@ from sqlalchemy.orm import declarative_base, sessionmaker, Session
 
 # Datenbank-URL sauber aus Env lesen
 POSTGRES_URL = (
-    f"postgresql+psycopg://{os.getenv('POSTGRES_USER')}:{os.getenv('POSTGRES_PASSWORD')}"
-    f"@{os.getenv('POSTGRES_HOST')}:{os.getenv('POSTGRES_PORT')}/{os.getenv('POSTGRES_DB')}"
+    f"postgresql+psycopg://{os.getenv('POSTGRES_USER')}:"
+    f"{os.getenv('POSTGRES_PASSWORD')}@{os.getenv('POSTGRES_HOST')}:"
+    f"{os.getenv('POSTGRES_PORT')}/{os.getenv('POSTGRES_DB')}"
 )
 
-engine = create_engine(POSTGRES_URL, echo=False)
+engine = create_engine(POSTGRES_URL, echo=True)
 SessionLocal = sessionmaker(bind=engine)
 
 Base = declarative_base()

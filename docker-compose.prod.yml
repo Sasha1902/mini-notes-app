@@ -2,31 +2,37 @@ services:
   db:
     image: postgres:16
     environment:
-      POSTGRES_DB: notesdb_prod
-      POSTGRES_USER: notes_prod
-      POSTGRES_PASSWORD: securepassword
+      POSTGRES_DB: notesdb
+      POSTGRES_USER: notes
+      POSTGRES_PASSWORD: notes
+    ports:
+      - "5434:5432"  # Prod DB Host-Port
     volumes:
-      - prod-db-data:/var/lib/postgresql/data
+      - db_prod_data:/var/lib/postgresql/data
 
   backend:
-    image: ghcr.io/sasha1902/mini-notes-backend:prod
+    build: ./backend
     environment:
-      POSTGRES_DB: notesdb_prod
-      POSTGRES_USER: notes_prod
-      POSTGRES_PASSWORD: securepassword
+      POSTGRES_DB: notesdb
+      POSTGRES_USER: notes
+      POSTGRES_PASSWORD: notes
       POSTGRES_HOST: db
       POSTGRES_PORT: 5432
+      NODE_ENV: production
     ports:
-      - "8000:8000"
+      - "8002:8000"
     depends_on:
       - db
 
   frontend:
-    image: ghcr.io/sasha1902/mini-notes-frontend:prod
+    build:
+      context: ./frontend
+      args:
+        VITE_API_URL: http://localhost:8002
     ports:
-      - "5173:80"
+      - "5175:80"
     depends_on:
       - backend
 
 volumes:
-  prod-db-data:
+  db_prod_data:

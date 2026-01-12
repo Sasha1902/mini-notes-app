@@ -2,19 +2,37 @@ services:
   db:
     image: postgres:16
     environment:
-      POSTGRES_DB: notesdb_test
-      POSTGRES_USER: test
-      POSTGRES_PASSWORD: test
+      POSTGRES_DB: notesdb
+      POSTGRES_USER: notes
+      POSTGRES_PASSWORD: notes
+    ports:
+      - "5433:5432"  # Test DB Host-Port
+    volumes:
+      - db_test_data:/var/lib/postgresql/data
 
-  backend-test:
-    build:
-      context: ./backend
-      dockerfile: Dockerfile.test
+  backend:
+    build: ./backend
     environment:
-      POSTGRES_DB: notesdb_test
-      POSTGRES_USER: test
-      POSTGRES_PASSWORD: test
+      POSTGRES_DB: notesdb
+      POSTGRES_USER: notes
+      POSTGRES_PASSWORD: notes
       POSTGRES_HOST: db
       POSTGRES_PORT: 5432
+      NODE_ENV: test
+    ports:
+      - "8001:8000"
     depends_on:
       - db
+
+  frontend:
+    build:
+      context: ./frontend
+      args:
+        VITE_API_URL: http://localhost:8001
+    ports:
+      - "5174:80"
+    depends_on:
+      - backend
+
+volumes:
+  db_test_data:

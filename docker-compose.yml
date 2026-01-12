@@ -1,25 +1,107 @@
+# docker-compose.all.yml
+version: "3.9"
 
 services:
-  # Kann als Grundlage dienen, z.B. für `docker compose up` ohne spezielle Env
-  db:
+  # ---------- DEV ----------
+  db-dev:
     image: postgres:16
-    container_name: notes-db
-    env_file:
-      - .env
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_DB: notesdb
+      POSTGRES_USER: notes
+      POSTGRES_PASSWORD: notes
     ports:
       - "5432:5432"
 
-  backend:
+  backend-dev:
     build: ./backend
-    container_name: notes-backend
-    env_file:
-      - .env
-    depends_on:
-      - db
+    environment:
+      POSTGRES_DB: notesdb
+      POSTGRES_USER: notes
+      POSTGRES_PASSWORD: notes
+      POSTGRES_HOST: db-dev
+      POSTGRES_PORT: 5432
     ports:
       - "8000:8000"
+    depends_on:
+      - db-dev
 
-volumes:
-  postgres_data:
+  frontend-dev:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        VITE_API_URL: http://localhost:8000
+    ports:
+      - "5173:80"
+    depends_on:
+      - backend-dev
+
+  # ---------- TEST ----------
+  db-test:
+    image: postgres:16
+    environment:
+      POSTGRES_DB: notesdb
+      POSTGRES_USER: notes
+      POSTGRES_PASSWORD: notes
+    ports:
+      - "5433:5432"
+
+  backend-test:
+    build: ./backend
+    environment:
+      POSTGRES_DB: notesdb
+      POSTGRES_USER: notes
+      POSTGRES_PASSWORD: notes
+      POSTGRES_HOST: db-test
+      POSTGRES_PORT: 5432
+      NODE_ENV: test
+    ports:
+      - "8001:8000"
+    depends_on:
+      - db-test
+
+  frontend-test:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        VITE_API_URL: http://localhost:8001
+    ports:
+      - "5174:80"
+    depends_on:
+      - backend-test
+
+  # ---------- PROD ----------
+  db-prod:
+    image: postgres:16
+    environment:
+      POSTGRES_DB: notesdb
+      POSTGRES_USER: notes
+      POSTGRES_PASSWORD: notes
+    ports:
+      - "5434:5432"
+
+  backend-prod:
+    build: ./backend
+    environment:
+      POSTGRES_DB: notesdb
+      POSTGRES_USER: notes
+      POSTGRES_PASSWORD: notes
+      POSTGRES_HOST: db-prod
+      POSTGRES_PORT: 5432
+      NODE_ENV: production
+    ports:
+      - "8002:8000"
+    depends_on:
+      - db-prod
+
+  frontend-prod:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        VITE_API_URL: http://localhost:8002
+    ports:
+      - "5175:80"
+    depends_on:
+      - backend-prod

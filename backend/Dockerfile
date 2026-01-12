@@ -1,16 +1,19 @@
-FROM python:3.12-slim
+FROM python:3.12-alpine
 
 WORKDIR /app
 
-# Damit Python Module in app gefunden werden
-ENV PYTHONPATH=/app
-
-# Abhängigkeiten installieren
+# Install dependencies
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# App-Code kopieren
-COPY app ./app
+# Copy everything
+COPY . .
 
-# Kommando zum Starten des Backends
+# PYTHONPATH auf /app setzen, damit 'app' gefunden wird
+ENV PYTHONPATH=/app
+
+# Expose backend port
+EXPOSE 8000
+
+# Start FastAPI über uvicorn
 CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]

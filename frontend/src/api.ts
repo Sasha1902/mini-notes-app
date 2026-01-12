@@ -1,10 +1,10 @@
+const API_URL = import.meta.env.VITE_API_URL as string;
+
 export interface Note { 
   id: string;
   title: string;
   content: string;
 }
-
-const API_URL = import.meta.env.VITE_API_URL as string;
 
 export async function fetchNotes(): Promise<Note[]> {
   const res = await fetch(`${API_URL}/notes`);

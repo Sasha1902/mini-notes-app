@@ -1,0 +1,25 @@
+
+services:
+  # Kann als Grundlage dienen, z.B. für `docker compose up` ohne spezielle Env
+  db:
+    image: postgres:16
+    container_name: notes-db
+    env_file:
+      - .env
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+  backend:
+    build: ./backend
+    container_name: notes-backend
+    env_file:
+      - .env
+    depends_on:
+      - db
+    ports:
+      - "8000:8000"
+
+volumes:
+  postgres_data:

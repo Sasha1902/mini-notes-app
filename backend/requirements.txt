@@ -1,0 +1,8 @@
+fastapi
+uvicorn[standard]
+psycopg[binary]
+python-multipart
+alembic
+sqlalchemy>=2.0
+pytest
+httpx
